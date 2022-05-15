@@ -1,8 +1,7 @@
 #include <Arduino.h>
 
-const int TRIG = 3;
-const int ECHO = 2;
-const int distancia_obstaculo = 20;
+const int TRIG = 3, ECHO = 2, buzzer = 7;
+unsigned int intervalo, distancia;
 
 int sensor_morcego(int pinotrig, int pinoecho);
 
@@ -10,24 +9,90 @@ void setup() {
   Serial.begin(9600);
   pinMode(TRIG,OUTPUT);
   pinMode(ECHO,INPUT);
+  pinMode(buzzer,OUTPUT);
+  pinMode(8,OUTPUT);
+  pinMode(9,OUTPUT);
+  pinMode(10,OUTPUT);
+  pinMode(11,OUTPUT);
+  pinMode(12,OUTPUT);
+  pinMode(13,OUTPUT);
 }
 
 void loop() {
-  int distancia = sensor_morcego(TRIG,ECHO);
-    if(distancia <= distancia_obstaculo){
-      Serial.print("Com obstaculo: ");
-      Serial.print(distancia);
-      Serial.println("cm");
+  distancia = sensor_morcego(TRIG,ECHO); // Chamada da função de leitura.
+  Serial.println(distancia);
+  if (distancia <= 10) { // Condicional para leituras inferiores a 10cm.
+    digitalWrite(13,HIGH);
+    digitalWrite(12,HIGH);
+    digitalWrite(11,HIGH);
+    digitalWrite(10,HIGH);
+    digitalWrite(9,HIGH);
+    digitalWrite(8,HIGH);
+    tone(buzzer, 1750);
+  }
+  else if (distancia > 60) { // Condicional para leituras superiores a 60cm.
+      digitalWrite(13,LOW);
+      digitalWrite(12,LOW);
+      digitalWrite(11,LOW);
+      digitalWrite(10,LOW);
+      digitalWrite(9,LOW);
+      digitalWrite(8,LOW);
+      noTone(buzzer);
+  } 
+  else { // Condicional para leitura intermediarias.
+    if (distancia <= 20) { 
+      digitalWrite(13,LOW);
+      digitalWrite(12,HIGH);
+      digitalWrite(11,HIGH);
+      digitalWrite(10,HIGH);
+      digitalWrite(9,HIGH);
+      digitalWrite(8,HIGH);
+      intervalo = 100;
     }
-    else{
-      Serial.print("Sem obstaculo: ");
-      Serial.print(distancia);
-      Serial.println("cm");
+    else if (distancia <= 30) {
+      digitalWrite(13,LOW);
+      digitalWrite(12,LOW);
+      digitalWrite(11,HIGH);
+      digitalWrite(10,HIGH);
+      digitalWrite(9,HIGH);
+      digitalWrite(8,HIGH);
+      intervalo = 150;
     }
-  delay(100);
+    else if (distancia <= 40) {
+      digitalWrite(13,LOW);
+      digitalWrite(12,LOW);
+      digitalWrite(11,LOW);
+      digitalWrite(10,HIGH);
+      digitalWrite(9,HIGH);
+      digitalWrite(8,HIGH);
+      intervalo = 200;
+    }
+    else if (distancia <= 50) {
+      digitalWrite(13,LOW);
+      digitalWrite(12,LOW);
+      digitalWrite(11,LOW);
+      digitalWrite(10,LOW);
+      digitalWrite(9,HIGH);
+      digitalWrite(8,HIGH);
+      intervalo = 250;
+    }
+    else if (distancia <= 60) {
+      digitalWrite(13,LOW);
+      digitalWrite(12,LOW);
+      digitalWrite(11,LOW);
+      digitalWrite(10,LOW);
+      digitalWrite(9,LOW);
+      digitalWrite(8,HIGH);
+      intervalo = 300;
+    }
+    tone(buzzer,1750);
+    delay(intervalo);
+    noTone(buzzer);
+    delay(intervalo);
+  }
 }
 
-int sensor_morcego(int pinotrig,int pinoecho){
+int sensor_morcego(int pinotrig,int pinoecho){ // Função para leitura do sensor
   digitalWrite(pinotrig,LOW);
   delayMicroseconds(2);
   digitalWrite(pinotrig,HIGH);
